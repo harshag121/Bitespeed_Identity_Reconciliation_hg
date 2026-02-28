@@ -86,7 +86,7 @@ Identifies a contact and consolidates all linked contact information.
 | Field         | Type   | Required      |
 |---------------|--------|---------------|
 | `email`       | string | at least one  |
-| `phoneNumber` | string | at least one  |
+| `phoneNumber` | string \\| number | at least one  |
 
 **Example Request**
 
