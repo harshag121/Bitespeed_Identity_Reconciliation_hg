@@ -1,6 +1,6 @@
 export interface IdentifyRequest {
   email?: string | null;
-  phoneNumber?: string | null;
+  phoneNumber?: string | number | null;
 }
 
 export interface ContactResponse {

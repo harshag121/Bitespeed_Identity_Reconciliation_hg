@@ -7,9 +7,9 @@ import type { Contact, IdentifyRequest, ContactResponse } from "../types";
 export async function identify(req: IdentifyRequest): Promise<ContactResponse> {
   const { email, phoneNumber } = req;
 
-  // Normalise: treat empty string as null
-  const normalEmail = email?.trim() || null;
-  const normalPhone = phoneNumber?.trim() || null;
+  // Normalise incoming values and accept numeric phoneNumber payloads.
+  const normalEmail = normalizeEmail(email);
+  const normalPhone = normalizePhoneNumber(phoneNumber);
 
   if (!normalEmail && !normalPhone) {
     throw new Error("At least one of email or phoneNumber must be provided.");
@@ -142,6 +142,39 @@ export async function identify(req: IdentifyRequest): Promise<ContactResponse> {
   );
 
   return buildResponse(thePrimary.id, allGroupContacts, secondaries);
+}
+
+function normalizeEmail(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  if (typeof value !== "string") {
+    throw new Error("email must be a string or null.");
+  }
+
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizePhoneNumber(value: unknown): string | null {
+  if (value === undefined || value === null) {
+    return null;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+
+  if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw new Error("phoneNumber must be a finite number, string, or null.");
+    }
+    return String(value);
+  }
+
+  throw new Error("phoneNumber must be a string, number, or null.");
 }
 
 /**
