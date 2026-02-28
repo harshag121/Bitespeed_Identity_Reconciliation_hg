@@ -16,7 +16,7 @@ A RESTful web service that identifies and tracks a customer's identity across mu
 | Language  | TypeScript 5                       |
 | Framework | Express 4                          |
 | ORM       | Prisma 5                           |
-| Database  | SQLite (dev) / PostgreSQL (prod)   |
+| Database  | PostgreSQL                         |
 
 ---
 
@@ -54,13 +54,23 @@ cd bitespeed-identity-reconciliation
 # 2. Install dependencies
 npm install
 
-# 3. Create .env file
-echo 'DATABASE_URL="file:./dev.db"' > .env
+# 3. Start PostgreSQL locally (Docker)
+docker run --name bitespeed-pg \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=bitespeed \
+  -p 5432:5432 \
+  -d postgres:16-alpine
 
-# 4. Push schema & generate Prisma client
+# 4. Create .env file
+echo 'DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bitespeed?schema=public"' > .env
+echo 'PORT=3000' >> .env
+
+# 5. Push schema & generate Prisma client
 npx prisma db push
+npx prisma generate
 
-# 5. Start dev server (with hot reload)
+# 6. Start dev server (with hot reload)
 npm run dev
 ```
 
@@ -125,14 +135,14 @@ curl -X POST http://localhost:3000/identify \
 
 ---
 
-## Switching to PostgreSQL (Production)
+## Deployment Notes
 
-1. Update `prisma/schema.prisma`:
-   ```prisma
-   datasource db {
-     provider = "postgresql"
-     url      = env("DATABASE_URL")
-   }
+1. Set `DATABASE_URL` in your host (Render/Railway/Fly) to a PostgreSQL connection string.
+2. Build command:
+   ```bash
+   npm ci && npx prisma generate && npx prisma db push && npm run build
    ```
-2. Set `DATABASE_URL` in `.env` to your Postgres connection string.
-3. Run `npx prisma migrate deploy`.
+3. Start command:
+   ```bash
+   npm start
+   ```
