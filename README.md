@@ -4,7 +4,7 @@ A RESTful web service that identifies and tracks a customer's identity across mu
 
 ## Live Endpoint
 
-> Deploy to Render / Railway / Fly.io and paste the URL here after deployment.
+https://bitespeed-identity-reconciliation-hg.onrender.com
 
 ---
 
